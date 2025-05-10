@@ -22,7 +22,7 @@ db.run(`
         email TEXT NOT NULL UNIQUE,
         username TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
-        liked_books TEXT DEFAULT '[]',
+        favourite_books TEXT DEFAULT '[]',
         read_books TEXT DEFAULT '[]',
         to_read_books TEXT DEFAULT '[]',
         created_date TEXT DEFAULT (datetime('now'))
@@ -37,6 +37,7 @@ db.run(`
         genre TEXT,
         description TEXT,
         published_year INTEGER,
+        like_count INTEGER,
         cover_image TEXT,
         created_date TEXT DEFAULT (datetime('now'))
     )
@@ -108,4 +109,75 @@ app.post("/login", (req, res) => {
             });
         }
     );
+});
+
+app.get("/get-books/:order", (req, res) => {
+    const { order } = req.params;
+
+    db.all("SELECT * FROM books ORDER BY ? DESC", [order], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+});
+
+app.get("/get-favourite-books", (req, res) => {
+    const userId = req.query.id; // change this
+
+    db.get("SELECT favourite_books FROM users WHERE id = ?", [userId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        let favouriteBookIds;
+        try {
+            favouriteBookIds = JSON.parse(row.favourite_books);
+        } catch (e) {
+            return res.status(500).json({ error: "Invalid favourite_books format." });
+        }
+
+        if (!Array.isArray(favouriteBookIds) || favouriteBookIds.length === 0) {
+            return res.json([]);
+        }
+
+        const placeholders = favouriteBookIds.map(() => '?').join(',');
+        const query = `SELECT * FROM books WHERE id IN (${placeholders})`;
+
+        db.all(query, favouriteBookIds, (err, books) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.json(books);
+        });
+    });
+});
+
+app.post("/add-book", (req, res) => {
+    const { title, author, genre, description, published_year, cover_image } = req.body;
+    const date = new Date().toLocaleString();
+
+    db.run(
+        "INSERT INTO books (title, author, genre, description, published_year, like_count, cover_image, created_date) VALUES (?, ?, ?, ?, ?, ? ,?)",
+        [title, author, genre, description, published_year, 0, cover_image, date],
+        function (err) {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.json({ message: "Signed up successfully", id: this.lastID });
+        }
+    );
+});
+
+app.delete("/delete-book/:id", (req, res) => {
+    const { id } = req.params;
+    db.run("DELETE FROM books WHERE id = ?", [id], function (err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: "Book deleted successfully. "});
+    });
 });
