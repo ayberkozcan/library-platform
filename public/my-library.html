@@ -7,6 +7,61 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <title>Library Platform - My Library</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 28px;
+        }
+
+        .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        background-color: #ccc;
+        border-radius: 34px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transition: .4s;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        border-radius: 50%;
+        transition: .4s;
+        }
+
+        input:checked + .slider {
+        background-color: #74C0FC;
+        }
+
+        input:checked + .slider:before {
+        transform: translateX(22px);
+        }
+
+        .slider.round {
+        border-radius: 34px;
+        }
+
+        .slider.round:before {
+        border-radius: 50%;
+        }
+</style>
 </head>
 <body class="bg-gray-100 font-sans">
 
@@ -37,9 +92,17 @@
         </button>
         </div>
     </div>
+        <div style="display: flex; align-items: center; gap: 10px; margin: 1rem 0;">
+            <span>Table View</span>
+            <label class="switch">
+                <input type="checkbox" id="viewToggle">
+                <span class="slider round"></span>
+            </label>
+            <span>List View</span>
+        </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div class="col-span-2 md:col-span-4">
-                <table class="table table-bordered table-striped table-dark w-full" id="booksTable" style="table-layout: fixed;">
+                <table class="table table-bordered table-striped w-full" id="booksTable" style="table-layout: fixed;">
                     <thead>
                         <tr>
                             <th><i class="fa-solid fa-image" style="color: #74C0FC;"></i> Cover</th>
@@ -47,7 +110,9 @@
                             <th><i class="fa-solid fa-user" style="color: #74C0FC;"></i> Author</th>
                             <th><i class="fa-solid fa-book" style="color: #74C0FC;"></i> Genre</th>
                             <th><i class="fa-solid fa-calendar" style="color: #74C0FC;"></i> Published Year</th>
-                            <th><i class="fa-solid fa-thumbs-up" style="color: #74C0FC;"></i> Like Count</th>
+                            <th><i class="fa-solid fa-file-lines" style="color: #74C0FC;"></i> Pages</th>
+                            <th><i class="fa-solid fa-book-open" style="color: #74C0FC;"></i> Status</th>
+                            <!-- <th><i class="fa-solid fa-thumbs-up" style="color: #74C0FC;"></i> Like Count</th> -->
                         </tr>
                     </thead>
                     <tbody id="book-list">
