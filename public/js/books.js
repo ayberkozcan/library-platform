@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             data.items.forEach(item => {
                 const volumeInfo = item.volumeInfo;
+                const bookId = item.id;
 
                 const title = volumeInfo.title || "Unknown Book";
                 const authors = volumeInfo.authors ? volumeInfo.authors.join(", ") : "Unknown Author";
@@ -38,6 +39,14 @@ document.addEventListener("DOMContentLoaded", function () {
                             <span class="text-yellow-500">${stars}</span>
                             <span class="ml-2 text-sm text-gray-600">${avgRating !== "?" ? avgRating : "No Rating"}</span>
                         </div>
+                        <div class="flex justify-between space-x-2 mb-2">
+                            <button data-book-id="${bookId}" data-title="${title}" class="btn-read flex-1 bg-green-500 text-white py-1 rounded hover:bg-green-600 flex items-center justify-center">
+                                ✅ <span class="ml-1">Read</span>
+                            </button>
+                            <button data-book-id="${bookId}" data-title="${title}" class="btn-to-read flex-1 bg-blue-500 text-white py-1 rounded hover:bg-blue-600 flex items-center justify-center">
+                                📚 <span class="ml-1">To Read</span>
+                            </button>
+                        </div>
                         <button class="w-full bg-indigo-600 text-white py-1 rounded hover:bg-indigo-700">Details</button>
                     </div>
                 `;
@@ -47,6 +56,35 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             console.error("Hata:", error);
             booksContainer.innerHTML = "<p class='col-span-full text-center text-red-500'>Bir hata oluştu.</p>";
+        }
+    });
+
+    document.addEventListener("click", async function (e) {
+        if (e.target.closest(".btn-read") || e.target.closest(".btn-to-read")) {
+            const button = e.target.closest("button");
+            const bookId = button.dataset.bookId;
+            const title = button.dataset.title;
+            const action = button.classList.contains("btn-read") ? "read" : "to_read";
+
+            try {
+                const response = await fetch("/update-book-status", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ bookId, title, action })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(`${action === "read" ? "Marked as Read" : "Added to To Read list"}: ${title}`);
+                } else {
+                    alert("This book is already in your list.");
+                }
+            } catch (err) {
+                console.error("Request failed:", err);
+                alert("An error occurred.");
+            }
         }
     });
 });

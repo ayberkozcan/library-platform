@@ -181,3 +181,36 @@ app.delete("/delete-book/:id", (req, res) => {
         res.json({ message: "Book deleted successfully. "});
     });
 });
+
+app.post("/update-book-status", (req, res) => {
+    const { bookId, action } = req.body;
+    // const userId = req.session.userId;
+    const userId = id;
+
+    if (!userId || !bookId || !["read", "to_read"].includes(action)) {
+        return res.json({ success: false });
+    }
+
+    db.get("SELECT read_books, to_read_books FROM users WHERE id = ?", [userId], (err, row) => {
+        if (err || !row) return res.json({ success: false });
+
+        let readBooks = JSON.parse(row.read_books || "[]");
+        let toReadBooks = JSON.parse(row.to_read_books || "[]");
+
+        if (action === "read") {
+            if (readBooks.includes(bookId)) return res.json({ success: false });
+            readBooks.push(bookId);
+        } else {
+            if (toReadBooks.includes(bookId)) return res.json({ success: false });
+            toReadBooks.push(bookId);
+        }
+
+        const column = action === "read" ? "read_books" : "to_read_books";
+        const updatedList = JSON.stringify(action === "read" ? readBooks : toReadBooks);
+
+        db.run(`UPDATE users SET ${column} = ? WHERE id = ?`, [updatedList, userId], function (err) {
+            if (err) return res.json({ success: false });
+            return res.json({ success: true });
+        });
+    });
+});
