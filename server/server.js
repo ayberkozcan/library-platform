@@ -214,3 +214,27 @@ app.post("/update-book-status", (req, res) => {
         });
     });
 });
+
+app.get('/user-books', async (req, res) => {
+    // const userId = req.params.id;
+    const userId = id;
+
+    try {
+        const result = await db.query(
+            'SELECT read_books, to_read_books FROM users WHERE id = $1',
+            [userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({
+            read_books: result.rows[0].read_books,
+            to_read_books: result.rows[0].to_read_books
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
