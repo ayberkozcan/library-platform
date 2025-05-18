@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //     viewToggle.checked = false;
     // });
 
-    // document.getElementById("addBookBtn").addEventListener("click", () => {
-    // });
+    document.getElementById("addBookBtn").addEventListener("click", () => {
+        window.location.href = "add-book.html";
+    });
 });

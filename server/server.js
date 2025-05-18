@@ -37,7 +37,6 @@ db.run(`
         genre TEXT,
         description TEXT,
         published_year INTEGER,
-        like_count INTEGER,
         cover_image TEXT,
         created_date TEXT DEFAULT (datetime('now'))
     )
@@ -237,4 +236,56 @@ app.get('/user-books', async (req, res) => {
         console.error(err);
         res.status(500).json({ message: "Server error" });
     }
+});
+
+app.post('/api/add-book', (req, res) => {
+    const {
+        title,
+        author,
+        genre,
+        description,
+        published_year,
+        cover
+    } = req.body;
+
+    const newBook = {
+        title,
+        author,
+        genre,
+        description,
+        published_year,
+        cover
+    };
+
+    const userId = id;
+    const column = "to_read_books";
+
+    db.get(`SELECT ${column} FROM users WHERE id = ?`, [userId], (err, row) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ error: 'Database error' });
+        }
+
+        let books = [];
+        if (row && row[column]) {
+            try {
+                books = JSON.parse(row[column]);
+            } catch (parseErr) {
+                console.error("JSON parse error:", parseErr);
+                return res.status(500).json({ error: 'Invalid book data' });
+            }
+        }
+
+        books.push(newBook);
+        const updatedBooks = JSON.stringify(books);
+
+        db.run(`UPDATE users SET ${column} = ? WHERE id = ?`, [updatedBooks, userId], function (err) {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ error: 'Failed to update book list' });
+            }
+
+            res.json({ success: true, message: "Book added successfully" });
+        });
+    });
 });
