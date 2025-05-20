@@ -1,0 +1,30 @@
+body.dark-mode {
+    background-color: #363636 !important;
+    color: white !important;
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: white;
+}
+
+.dark-mode .card {
+  background-color: #1e1e1e;
+  color: white;
+  border-color: #333;
+}
+
+.dark-mode .form-control {
+  background-color: #2c2c2c;
+  color: white;
+  border-color: #555;
+}
+
+.dark-mode .btn-outline-dark {
+  color: white;
+  border-color: white;
+}
+
+.dark-mode a {
+  color: lightblue;
+}
