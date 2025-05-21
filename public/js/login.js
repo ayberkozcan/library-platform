@@ -55,7 +55,7 @@ function checkInputsForLogin(inputs) {
                 localStorage.setItem('userData', JSON.stringify(userData));
             }
             alert("Login Successful!");
-            window.location.href = "homepage.html";
+            window.location.href = "index.html";
         } else {
             loginSuccess = false;
             alert("Invalid Email, Username or Password!");
@@ -140,7 +140,7 @@ form.addEventListener("submit", function(e) {
                     throw new Error(body.error || "An error occurred while adding the user!");
                 }
                 alert(body.message);
-                window.location.href = "homepage.html";
+                window.location.href = "index.html";
             })
             .catch(error => {
                 console.error("Error:", error);
