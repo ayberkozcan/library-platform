@@ -195,13 +195,3 @@ document.getElementById("signupBtn").addEventListener("click", function(e) {
         document.getElementById("signupBtn").innerHTML = "Sign Up";
     }
 });
-
-document.getElementById("themeToggle").addEventListener("click", function (e) {
-    if (localStorage.getItem("theme") === "light") {
-        document.getElementById("themeToggle").innerText = "🌙";
-        document.getElementById("themeToggle").classList.replace("btn-light", "btn-dark");
-    } else {
-        document.getElementById("themeToggle").innerText = "🌞";
-        document.getElementById("themeToggle").classList.replace("btn-dark", "btn-light");
-    }
-});
